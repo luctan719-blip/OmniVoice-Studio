@@ -12,6 +12,7 @@ import {
   Copy,
   ExternalLink,
   ArrowRightLeft,
+  FileText,
 } from 'lucide-react';
 import { Button, Segmented, Progress } from '../../ui';
 import { useAppStore } from '../../store';
@@ -47,6 +48,28 @@ const ENGINE_CHIP =
 // rather than a muted footnote.
 const ENGINE_INSTALL_BTN =
   'inline-flex items-center gap-[3px] ml-[6px] px-[7px] py-[1px] text-[0.55rem] font-semibold leading-[1.5] bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-[var(--color-fg-inverse)] border border-transparent rounded-[var(--radius-pill)] whitespace-nowrap cursor-pointer transition-colors shadow-[0_0_0_2px_color-mix(in_srgb,var(--color-brand)_25%,transparent)] disabled:opacity-60 disabled:cursor-default';
+
+const parseSRT = (data) => {
+  const regex = /(\d+)\r?\n(\d\d:\d\d:\d\d,\d\d\d) --> (\d\d:\d\d:\d\d,\d\d\d)\r?\n([\s\S]*?)(?=\r?\n\r?\n|\r?\n*$)/g;
+  const results = [];
+  let matches;
+
+  const timeToSeconds = (timeString) => {
+    const [hours, minutes, seconds] = timeString.split(':');
+    const [secs, ms] = seconds.split(',');
+    return parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60 + parseInt(secs, 10) + parseInt(ms, 10) / 1000;
+  };
+
+  while ((matches = regex.exec(data)) !== null) {
+    results.push({
+      id: matches[1],
+      start: timeToSeconds(matches[2]),
+      end: timeToSeconds(matches[3]),
+      text: matches[4].trim().replace(/\r?\n/g, ' ')
+    });
+  }
+  return results;
+};
 
 export default function DubLeftColumn({
   hasDubbedTrack,
@@ -698,6 +721,50 @@ export default function DubLeftColumn({
             >
               {t('dub.restore')}
             </Button>
+            <Button
+              variant="subtle"
+              size="sm"
+              onClick={() => document.getElementById('srt-import-timeline-input')?.click()}
+              title={t('dub.import_srt')}
+              leading={<FileText size={10} />}
+            >
+              {t('dub.import_srt')}
+            </Button>
+            <input
+              id="srt-import-timeline-input"
+              type="file"
+              accept=".srt,text/srt,text/plain"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                  const text = event.target?.result;
+                  if (typeof text === 'string') {
+                    try {
+                      const parsed = parseSRT(text);
+                      if (parsed.length === 0) {
+                        toast.error("Không tìm thấy phụ đề hợp lệ trong file SRT.");
+                        return;
+                      }
+                      const formatted = parsed.map((s) => ({
+                        ...s,
+                        id: s.id ? String(s.id) : String(Math.random()),
+                        text_original: s.text,
+                        speaker_id: s.speaker_id || 'Speaker 1',
+                      }));
+                      editSegments(formatted);
+                      toast.success(`Đã nhập thành công ${formatted.length} phụ đề.`);
+                    } catch (err) {
+                      toast.error("Lỗi khi đọc file SRT: " + err.message);
+                    }
+                  }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+              }}
+            />
             <Button
               variant="subtle"
               size="sm"

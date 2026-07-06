@@ -182,6 +182,8 @@ function DubSegmentRow({
     onSeek(seg.start);
   };
 
+  const canSelectRow = true; // Luôn cho phép chọn để tạo lại lẻ dòng
+
   return (
     <div
       style={style}
@@ -192,8 +194,8 @@ function DubSegmentRow({
         type="checkbox"
         checked={!!selected}
         onChange={(e) => onSelect(seg.id, idx, e.nativeEvent.shiftKey)}
-        onClick={(e) => onSelect(seg.id, idx, e.shiftKey)}
-        disabled={disabled}
+        onClick={(e) => e.stopPropagation()}
+        disabled={!canSelectRow}
         className="cursor-pointer justify-self-center"
         title={t('segment.select_title')}
       />

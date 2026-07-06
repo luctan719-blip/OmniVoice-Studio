@@ -586,6 +586,7 @@ export default function DubTab(props) {
             qcRunning={qcRunning}
             handleDubQc={handleDubQc}
             setExportOpen={setExportOpen}
+            selectedSegIds={selectedSegIds}
           />
           <div className="grid grid-cols-2 max-[1000px]:grid-cols-1 max-[1000px]:grid-rows-[auto_1fr] gap-[6px] flex-1 min-h-0 overflow-hidden">
             <DubLeftColumn

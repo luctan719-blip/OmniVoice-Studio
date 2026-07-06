@@ -228,7 +228,7 @@ export default function DubSegmentTable({
           isPlaying={isPlaying}
           timelineSelected={timelineSelected}
           previewLoading={previewId === seg.id}
-          selected={sel && sel.has(seg.id)}
+          selected={sel && sel.has(String(seg.id))}
           canMerge={canMerge}
           profiles={profs}
           speakerClones={clones}
@@ -248,7 +248,7 @@ export default function DubSegmentTable({
   );
 
   const allFilteredSelected =
-    filtered.length > 0 && filtered.every((s) => selectedIds && selectedIds.has(s.id));
+    filtered.length > 0 && filtered.every((s) => selectedIds && selectedIds.has(String(s.id)));
   const selCount = selectedIds?.size ?? 0;
   const meta = (
     <>

@@ -33,6 +33,7 @@ export default function DubHeader({
   qcRunning,
   handleDubQc,
   setExportOpen,
+  selectedSegIds,
 }) {
   return (
     <div className="flex flex-col gap-[2px] min-w-0 px-[10px] py-[4px] shrink-0 bg-[var(--color-bg-elev-1)] rounded-md mb-[2px]">
@@ -125,6 +126,20 @@ export default function DubHeader({
                     }
                     icon={<Play size={11} />}
                     label={t('dub.regen_changed', { count: incrementalPlan.stale.length })}
+                  />
+                )}
+                {dubStep === 'done' && selectedSegIds && selectedSegIds.size > 0 && (
+                  <FooterBtn
+                    sm
+                    tone="pink"
+                    onClick={() =>
+                      handleDubGenerate({ regenOnly: Array.from(selectedSegIds), preview: false })
+                    }
+                    icon={<Play size={11} />}
+                    label={t('dub.regen_selected', {
+                      count: selectedSegIds.size,
+                      defaultValue: 'Regenerate selected ({{count}})',
+                    })}
                   />
                 )}
               </>

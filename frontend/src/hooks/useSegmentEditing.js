@@ -137,11 +137,12 @@ export default function useSegmentEditing() {
           const [a, b] = [lastSelectedIdxRef.current, idx].sort((x, y) => x - y);
           for (let i = a; i <= b; i++) {
             const s = dubSegments[i];
-            if (s) next.add(s.id);
+            if (s) next.add(String(s.id));
           }
         } else {
-          if (next.has(id)) next.delete(id);
-          else next.add(id);
+          const idStr = String(id);
+          if (next.has(idStr)) next.delete(idStr);
+          else next.add(idStr);
           lastSelectedIdxRef.current = idx;
         }
         return next;
@@ -151,7 +152,7 @@ export default function useSegmentEditing() {
   );
 
   const selectAllSegs = useCallback((segs) => {
-    setSelectedSegIds(new Set(segs.map((s) => s.id)));
+    setSelectedSegIds(new Set(segs.map((s) => String(s.id))));
   }, []);
 
   const clearSegSelection = useCallback(() => setSelectedSegIds(new Set()), []);
@@ -162,7 +163,7 @@ export default function useSegmentEditing() {
       if (!selectedSegIds.size) return;
       pushUndo(dubSegments);
       setDubSegments((prev) =>
-        prev.map((s) => (selectedSegIds.has(s.id) ? { ...s, ...patch } : s)),
+        prev.map((s) => (selectedSegIds.has(String(s.id)) ? { ...s, ...patch } : s)),
       );
     },
     [dubSegments, selectedSegIds],
@@ -177,7 +178,7 @@ export default function useSegmentEditing() {
     )
       return;
     pushUndo(dubSegments);
-    setDubSegments((prev) => prev.filter((s) => !selectedSegIds.has(s.id)));
+    setDubSegments((prev) => prev.filter((s) => !selectedSegIds.has(String(s.id))));
     setSelectedSegIds(new Set());
   }, [dubSegments, selectedSegIds]);
 

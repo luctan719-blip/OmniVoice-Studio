@@ -817,6 +817,7 @@
     "stopping": "Đang dừng…",
     "stop_progress": "Dừng lại ({{current}}/{{total}})",
     "regen_changed": "Regen {{count}} đã thay đổi",
+    "regen_selected": "Tạo lại dòng đã chọn ({{count}})",
     "export_btn": "Xuất khẩu…",
     "prep_stop": "Dừng lại",
     "install_progress": "Đang cài đặt _V_0__…",
